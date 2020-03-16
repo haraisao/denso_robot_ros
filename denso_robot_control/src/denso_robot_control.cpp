@@ -33,6 +33,10 @@ int main(int argc, char *argv[])
 
   denso_robot_control::DensoRobotHW drobo;
   HRESULT hr = drobo.Initialize();
+  // for Cobotta (I.Hara)
+  if (nh.getNamespace() == "/cobotta"){
+     drobo.init_CobottaHand();
+  } 
   if(SUCCEEDED(hr)) {
       controller_manager::ControllerManager cm(&drobo, nh);
 

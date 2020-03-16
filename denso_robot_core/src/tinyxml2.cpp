@@ -951,6 +951,8 @@ char* XMLNode::ParseDeep( char* p, StrPair* parentEnd )
         if ( node == 0 ) {
             break;
         }
+        //
+        int initialLineNum = node->_parseLineNum;
 
         StrPair endTag;
         p = node->ParseDeep( p, &endTag );
@@ -964,13 +966,25 @@ char* XMLNode::ParseDeep( char* p, StrPair* parentEnd )
 
         XMLDeclaration* decl = node->ToDeclaration();
         if ( decl ) {
-                // A declaration can only be the first child of a document.
-                // Set error, if document already has children.
-                if ( !_document->NoChildren() ) {
-                        _document->SetError( XML_ERROR_PARSING_DECLARATION, decl->Value(), 0);
-                        DeleteNode( decl );
+            // A declaration can only be the first child of a document.
+            // Set error, if document already has children.
+            // Declarations are only allowed at document level
+            bool wellLocated = ( ToDocument() != 0 );
+            if ( wellLocated ) {
+                // Multiple declarations are allowed but all declarations
+                // must occur before anything else
+                for ( const XMLNode* existingNode = _document->FirstChild(); existingNode; existingNode = existingNode->NextSibling() ) {
+                    if ( !existingNode->ToDeclaration() ) {
+                        wellLocated = false;
                         break;
+                    }
                 }
+            }
+            if ( !wellLocated ) {
+                _document->SetError( XML_ERROR_PARSING_DECLARATION, 0, 0);
+                DeleteNode( node );
+                break;
+            }
         }
 
         XMLElement* ele = node->ToElement();

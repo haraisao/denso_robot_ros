@@ -871,6 +871,8 @@ protected:
     XMLDocument*	_document;
     XMLNode*		_parent;
     mutable StrPair	_value;
+    //
+    int         _parseLineNum;
 
     XMLNode*		_firstChild;
     XMLNode*		_lastChild;

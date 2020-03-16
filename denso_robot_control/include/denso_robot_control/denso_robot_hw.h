@@ -74,6 +74,9 @@ namespace denso_robot_control
 
     bool is_SlaveSyncMode() const;
 
+    // for Cobotta Hand (I.Hara)
+    void init_CobottaHand();
+
   private:
     HRESULT ChangeModeWithClearError(int mode);
     void Callback_ChangeMode(const Int32::ConstPtr& msg);
@@ -84,6 +87,9 @@ namespace denso_robot_control
     void Callback_HandIO(const Int32::ConstPtr& msg);
     void Callback_SendUserIO(const UserIO::ConstPtr& msg);
     void Callback_RecvUserIO(const UserIO::ConstPtr& msg);    
+    // for Cobotta Hand (I.Hara)
+    void Callback_Cobotta_HandIO(const Int32::ConstPtr& msg);    
+    void Callback_Cobotta_Motor(const Int32::ConstPtr& msg);    
 
   private:
     hardware_interface::JointStateInterface m_JntStInterface;
@@ -110,6 +116,9 @@ namespace denso_robot_control
     ros::Subscriber m_subHandIO;
     ros::Subscriber m_subSendUserIO;
     ros::Subscriber m_subRecvUserIO;
+    /// for Cobotta Hand (I.Hara)
+    ros::Subscriber m_subCobottaHandIO;
+    ros::Subscriber m_subCobottaMotor;
 
     ros::Publisher  m_pubCurMode;
     ros::Publisher  m_pubMiniIO;

@@ -1446,4 +1446,120 @@ int DensoRobotRC8::get_Timestamp() const
   return m_timestamp;
 }
   
+/********** for COBOTTA *******/
+HRESULT DensoRobotRC8::CobottaHandIO(unsigned long handle, int arg)
+{
+  HRESULT hr = S_OK;
+  int argc;
+  VARIANT_Vec vntArgs;
+  VARIANT *pvnt;
+  VARIANT_Ptr vntRet(new VARIANT());
+
+  VariantInit(vntRet.get());
+
+  for(argc = 0; argc < BCAP_ROBOT_EXECUTE_ARGS; argc++) {
+    VARIANT_Ptr vntTmp(new VARIANT());
+    VariantInit(vntTmp.get());
+
+    switch(argc) {
+      case 0:
+        vntTmp->vt = VT_UI4;
+        vntTmp->ulVal = handle;
+        break;
+      case 1:
+        vntTmp->vt = VT_BSTR;
+        if (arg < 0){
+          vntTmp->bstrVal = SysAllocString(L"HandMoveA");
+        }else{
+          vntTmp->bstrVal = SysAllocString(L"HandMoveAH");
+        }
+        break;
+      case 2:
+        vntTmp->vt = (VT_ARRAY | VT_VARIANT);
+        if (arg < 0){
+          vntTmp->parray = SafeArrayCreateVector(VT_VARIANT, 0, 2);
+          SafeArrayAccessData(vntTmp->parray, (void**)&pvnt);
+      
+          pvnt[0].vt = VT_R8;
+          pvnt[0].dblVal = 30.0;
+
+          pvnt[1].vt = VT_UI1;
+          pvnt[1].bVal = 100;
+
+          SafeArrayUnaccessData(vntTmp->parray);
+        }else{
+          vntTmp->parray = SafeArrayCreateVector(VT_VARIANT, 0, 4);
+          SafeArrayAccessData(vntTmp->parray, (void**)&pvnt);
+
+          pvnt[0].vt = VT_R8;
+          pvnt[0].dblVal = (double)arg;
+
+          pvnt[1].vt = VT_UI1;
+          pvnt[1].bVal = 100;
+
+          pvnt[2].vt = VT_R8;
+          pvnt[2].dblVal = 20.0;
+
+          pvnt[3].vt = VT_BSTR;
+          pvnt[3].bstrVal = SysAllocString(L"Next");
+          SafeArrayUnaccessData(vntTmp->parray);
+        }
+
+        break;
+    }
+
+    vntArgs.push_back(*vntTmp.get());
+  }
+
+  hr = m_vecService[DensoBase::SRV_WATCH]->ExecFunction(ID_CONTROLLER_EXECUTE, vntArgs, vntRet);
+
+  if(SUCCEEDED(hr)) {
+    std::cerr << "Move HandIO:" << arg << std::endl;
+  }else{
+    std::cerr << "Fail to execute HandIO" << std::endl;
+  }
+
+  return hr;
+}
+
+HRESULT DensoRobotRC8::CobottaMotor(int arg)
+{
+  HRESULT hr = S_OK;
+  int argc;
+  VARIANT_Vec vntArgs;
+  VARIANT *pvnt;
+  VARIANT_Ptr vntRet(new VARIANT());
+
+  VariantInit(vntRet.get());
+
+  for(argc = 0; argc < BCAP_ROBOT_EXECUTE_ARGS; argc++) {
+    VARIANT_Ptr vntTmp(new VARIANT());
+    VariantInit(vntTmp.get());
+
+    switch(argc) {
+      case 0:
+        vntTmp->vt = VT_UI4;
+        vntTmp->ulVal = m_vecHandle[DensoBase::SRV_WATCH];
+        break;
+      case 1:
+        vntTmp->vt = VT_BSTR;
+        vntTmp->bstrVal = SysAllocString(L"Motor");
+        break;
+      case 2:
+        vntTmp->vt = VT_BSTR;
+        if(arg == 1){
+          vntTmp->bstrVal = SysAllocString(L"1");
+        }else{
+          vntTmp->bstrVal = SysAllocString(L"0");
+        }
+        break;
+    }
+    vntArgs.push_back(*vntTmp.get());
+  }
+
+  hr = m_vecService[DensoBase::SRV_WATCH]->ExecFunction(ID_ROBOT_EXECUTE, vntArgs, vntRet);
+
+  return hr;
+}
+
 }

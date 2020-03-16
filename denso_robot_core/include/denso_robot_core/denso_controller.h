@@ -54,6 +54,8 @@ public:
 
   HRESULT AddVariable(const std::string& name);
 
+  unsigned long getControlHandle(){ return m_vecHandle[1];}
+
 protected:
   virtual HRESULT AddController() = 0;
   virtual HRESULT AddRobot(XMLElement *xmlElem) = 0;

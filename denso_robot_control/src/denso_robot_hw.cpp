@@ -115,9 +115,9 @@ namespace denso_robot_control
       case DensoRobotRC8::RECVFMT_POSE_TJ:
         break;
       default:
-	ROS_WARN("Recieve format has to contain joint.");
-	m_recvfmt = ((m_recvfmt & ~DensoRobotRC8::RECVFMT_POSE)
-	  | DensoRobotRC8::RECVFMT_POSE_J);
+        ROS_WARN("Recieve format has to contain joint.");
+        m_recvfmt = ((m_recvfmt & ~DensoRobotRC8::RECVFMT_POSE)
+                          | DensoRobotRC8::RECVFMT_POSE_J);
         break;
     }
 
@@ -241,36 +241,36 @@ namespace denso_robot_control
     
       if(m_sendfmt & DensoRobotRC8::SENDFMT_HANDIO)
       {
-	m_subHandIO = nh.subscribe<Int32>(
-	  "Write_HandIO", 1, &DensoRobotHW::Callback_HandIO, this);
+        m_subHandIO = nh.subscribe<Int32>("Write_HandIO", 1,
+                                     &DensoRobotHW::Callback_HandIO, this);
       }
       if(m_sendfmt & DensoRobotRC8::SENDFMT_MINIIO)
       {
-	m_subMiniIO = nh.subscribe<Int32>(
-	  "Write_MiniIO", 1, &DensoRobotHW::Callback_MiniIO, this);
+        m_subMiniIO = nh.subscribe<Int32>("Write_MiniIO", 1,
+                                     &DensoRobotHW::Callback_MiniIO, this);
       }
       if(m_sendfmt & DensoRobotRC8::SENDFMT_USERIO)
       {
-	m_subSendUserIO = nh.subscribe<UserIO>(
-	  "Write_SendUserIO", 1, &DensoRobotHW::Callback_SendUserIO, this);
+        m_subSendUserIO = nh.subscribe<UserIO>("Write_SendUserIO", 1,
+                                     &DensoRobotHW::Callback_SendUserIO, this);
       }
       if(m_recvfmt & DensoRobotRC8::RECVFMT_HANDIO)
       {
-	m_pubHandIO = nh.advertise<Int32>("Read_HandIO", 1);
+        m_pubHandIO = nh.advertise<Int32>("Read_HandIO", 1);
       }
       if(m_recvfmt & DensoRobotRC8::RECVFMT_CURRENT)
       {
-	m_pubCurrent = nh.advertise<Float64MultiArray>("Read_Current", 1);
+        m_pubCurrent = nh.advertise<Float64MultiArray>("Read_Current", 1);
       }
       if(m_recvfmt & DensoRobotRC8::RECVFMT_MINIIO)
       {
-	m_pubMiniIO = nh.advertise<Int32>("Read_MiniIO", 1);
+        m_pubMiniIO = nh.advertise<Int32>("Read_MiniIO", 1);
       }
       if(m_recvfmt & DensoRobotRC8::RECVFMT_USERIO)
       {
-	m_subRecvUserIO = nh.subscribe<UserIO>(
-	  "Write_RecvUserIO", 1, &DensoRobotHW::Callback_RecvUserIO, this);
-	m_pubRecvUserIO = nh.advertise<UserIO>("Read_RecvUserIO", 1);
+        m_subRecvUserIO = nh.subscribe<UserIO>("Write_RecvUserIO", 1,
+                                     &DensoRobotHW::Callback_RecvUserIO, this);
+        m_pubRecvUserIO = nh.advertise<UserIO>("Read_RecvUserIO", 1);
       }
     }
     
@@ -301,9 +301,9 @@ namespace denso_robot_control
       if(SUCCEEDED(hr)) {
         strTypeName = DensoBase::ConvertBSTRToString(vntVal->bstrVal);
         if(strncmp(m_robName.c_str(), strTypeName.c_str(),
-		   (m_robName.length() < strTypeName.length())
-		   ? m_robName.length() : strTypeName.length()))
-	{
+              (m_robName.length() < strTypeName.length())
+                            ? m_robName.length() : strTypeName.length()))
+        {
           hr = E_FAIL;
         }
       }
@@ -367,27 +367,27 @@ namespace denso_robot_control
       if(SUCCEEDED(hr)) {
         if(m_recvfmt & DensoRobotRC8::RECVFMT_HANDIO)
         {
-	  Int32 msg;
-	  msg.data = m_rob->get_HandIO();
-	  m_pubHandIO.publish(msg);
+          Int32 msg;
+          msg.data = m_rob->get_HandIO();
+          m_pubHandIO.publish(msg);
         }
         if(m_recvfmt & DensoRobotRC8::RECVFMT_CURRENT)
         {
-	  Float64MultiArray msg;
-	  m_rob->get_Current(msg.data);
-	  m_pubCurrent.publish(msg);
+          Float64MultiArray msg;
+          m_rob->get_Current(msg.data);
+          m_pubCurrent.publish(msg);
         }
         if(m_recvfmt & DensoRobotRC8::RECVFMT_MINIIO)
         {
-	  Int32 msg;
-	  msg.data = m_rob->get_MiniIO();
-	  m_pubMiniIO.publish(msg);
+          Int32 msg;
+          msg.data = m_rob->get_MiniIO();
+          m_pubMiniIO.publish(msg);
         }
         if(m_recvfmt & DensoRobotRC8::RECVFMT_USERIO)
         {
-	  UserIO msg;
-	  m_rob->get_RecvUserIO(msg);
-	  m_pubRecvUserIO.publish(msg);
+          UserIO msg;
+          m_rob->get_RecvUserIO(msg);
+          m_pubRecvUserIO.publish(msg);
         }	
       }
       else if(FAILED(hr) && (hr != E_BUF_FULL)) {
@@ -431,4 +431,29 @@ namespace denso_robot_control
     }
     return false;
   }
+
+  /***** for COBOTTA ***********/
+  void DensoRobotHW::init_CobottaHand()
+  {
+     ros::NodeHandle nh;
+     m_subCobottaHandIO = nh.subscribe<Int32>("Cobotta_HandIO", 1,
+                                 &DensoRobotHW::Callback_Cobotta_HandIO, this);
+
+     m_subCobottaMotor = nh.subscribe<Int32>("Cobotta_Motor", 1,
+                                 &DensoRobotHW::Callback_Cobotta_Motor, this);
+    return;
+  }
+
+  void DensoRobotHW::Callback_Cobotta_HandIO(const Int32::ConstPtr& msg)
+  {
+    m_rob->CobottaHandIO(m_ctrl->getControlHandle(), msg->data);
+    return;
+  }
+
+  void DensoRobotHW::Callback_Cobotta_Motor(const Int32::ConstPtr& msg)
+  {
+    m_rob->CobottaMotor(msg->data);
+    return;
+  }
+
 } // denso_robot_control
