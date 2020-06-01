@@ -1,0 +1,168 @@
+#!/bin/bash
+source ~/cobotta_ws/devel/setup.bash
+
+rosservice call /bcap_service '{func_id: 3, vntArgs: [{vt: 8, value: "b-CAP"}, {vt: 8, value: "CaoProv.DENSO.VRC"}, {vt: 8, value: "localhost"}, {vt: 8, value: ""}] }'
+
+And then you receive the controller handle as return value.
+HRESULT: 0 vntRet: vt: 19 value: "<controller handle>"
+The following command moves the gripper to maximum width (30mm).
+ubuntu@rosservice call /bcap_service '{func_id: 17, vntArgs: [{vt: 19, value: "<controller handle>"}, {vt: 8, value: "HandMoveA"}, {vt: 8195, value: "30, 100"}] }'
+The following command clear the error.
+ubuntu@rosservice call /bcap_service '{func_id: 17, vntArgs: [{vt: 19, value: "<controller handle>"}, {vt: 8, value: "ClearError"}] }'CAUTION:
+----------------------------------
+■caoCtrl.AddRobot "Robot0",""
+----------------------------------
+ubuntu@rosservice call /bcap_service '{func_id: 7, vntArgs: [{vt: 3, value: "<controller handle>"}, {vt: 8, value: "Robot0"}, {vt: 8, value: ""}] }'
+func_id:7  // ID_CONTROLLER_GETROBOT
+vt:3        // VT_I4 (LONG)
+vt:8        // VT_BSTR
+And then you receive the robot handle as return value.
+HRESULT: 0 vntRet: vt: 20 value: "<robot handle>"
+----------------------------------
+■caoRobot.Execute "TakeArm", Array(0,0)
+----------------------------------
+ubuntu@rosservice call /bcap_service '{func_id: 64, vntArgs: [{vt: 3, value: "<robot handle>"}, {vt: 8, value: "TakeArm"}, {vt: 8195, value: "0,0"}] }'
+func_id:64  // ID_ROBOT_EXECUTE
+vt:3        // VT_I4 (LONG)
+vt:8        // VT_BSTR
+vt:8195     // VT_ARRAY = 8192 | VT_I4 = 3
+----------------------------------
+■caoRobot.Execute "TakeArm",""
+----------------------------------
+ubuntu@rosservice call /bcap_service '{func_id: 64, vntArgs: [{vt: 3, value: "<robot handle>"}, {vt: 8, value: "TakeArm"}, {vt: 8, value: ""}] }'
+func_id:64  // ID_ROBOT_EXECUTE
+vt:3        // VT_I4 (LONG)
+vt:8        // VT_BSTR
+----------------------------------
+■caoRobot.Execute "Motor",Array(1,0) // Motor on
+----------------------------------
+ubuntu@rosservice call /bcap_service '{func_id: 64, vntArgs: [{vt: 3, value: "<robot handle>"}, {vt: 8, value: "Motor"}, , {vt: 8195, value: "1,0"}]}'
+func_id:64  // ID_ROBOT_EXECUTE
+vt:3        // VT_I4 (LONG)
+vt:8        // VT_BSTR
+vt:8195     // VT_ARRAY = 8192 | VT_I4 = 3
+----------------------------------
+■caoRobot.Execute "Motor","1" // Motor on
+----------------------------------
+ubuntu@rosservice call /bcap_service '{func_id: 64, vntArgs: [{vt: 3, value: "<robot handle>"}, {vt: 8, value: "Motor"}, {vt: 8, value: "1"}] }'
+func_id:64  // ID_ROBOT_EXECUTE
+vt:3        // VT_I4 (LONG)
+vt:8        // VT_BSTR
+----------------------------------
+■caoRobot.Move 1,"J(0,45,90,0,45,0)",""
+----------------------------------
+ubuntu@rosservice call /bcap_service '{func_id: 72, vntArgs: [{vt: 3, value: "<robot handle>"}, {vt: 3, value: "1"}, {vt: 8, value: "J(0,45,90,0,45,0)"}, {vt: 8, value: ""}] }'
+func_id:72  // ID_ROBOT_MOVE
+vt:3        // VT_I4 (LONG)
+vt:8        // VT_BSTR
+----------------------------------
+■caoRobot.Execute "Motor","0" // Motor off
+----------------------------------
+ubuntu@rosservice call /bcap_service '{func_id: 64, vntArgs: [{vt: 3, value: "<robot handle>"}, {vt: 8, value: "Motor"}, {vt: 8, value: "0"}] }'
+func_id:64  // ID_ROBOT_EXECUTE
+vt:3        // VT_I4 (LONG)
+vt:8        // VT_BSTR
+---------------------------------
+■caoRobot.Execute "GiveArm",""
+-----------------------------------
+ubuntu@rosservice call /bcap_service '{func_id: 64, vntArgs: [{vt: 3, value: "<robot handle>"}, {vt: 8, value: "GiveArm"}, {vt: 8, value: ""}] }'
+func_id:64  // ID_ROBOT_EXECUTE
+vt:3        // VT_I4 (LONG)
+vt:8        // VT_BSTR
+----------------------------------
+■Robot Release
+----------------------------------
+ubuntu@rosservice call /bcap_service '{func_id: 84, vntArgs: [{vt: 3, value: "<robot handle>"}] }'
+func_id:84  // ID_ROBOT_RELEASE
+vt:3        // VT_I4 (LONG)
+----------------------------------
+■Controller Release
+----------------------------------
+ubuntu@rosservice call /bcap_service '{func_id: 4, vntArgs: [{vt: 3, value: "<controller handle>"}] }'
+func_id:4  // ID_CONTROLLER_DISCONNECT
+vt:3        // VT_I4 (LONG)
+----------------------------------
+■caoCtrl.Execute "HandMoveA", Array(30,100)
+----------------------------------
+ubuntu@rosservice call /bcap_service '{func_id: 17, vntArgs: [{vt: 3, value: "<controller handle>"}, {vt: 8, value: "HandMoveA"}, {vt: 8195, value: "30, 100"}] }'
+func_id:17  // ID_CONTROLLER_EXECUTE
+vt:3        // VT_I4 (LONG)
+vt:8        // VT_BSTR
+vt:8195     // VT_ARRAY = 8192 | VT_I4 = 3
+----------------------------------
+■caoCtrl.Execute "ClearError"
+----------------------------------
+ubuntu@rosservice call /bcap_service '{func_id: 17, vntArgs: [{vt: 3, value: "<controller handle>"}, {vt: 8, value: "ClearError"}] }'
+func_id:17  // ID_CONTROLLER_EXECUTE
+vt:3        // VT_I4 (LONG)
+vt:8        // VT_BSTR
+----------------------------------
+■caoCtrl.AddTask "Pro1",""
+----------------------------------
+ubuntu@rosservice call /bcap_service '{func_id: 8, vntArgs: [{vt: 3, value: "<controller handle>"}, {vt: 8, value: "Pro1"}, {vt: 8, value: ""}] }'
+func_id:8  // ID_CONTROLLER_GETTASK
+vt:3        // VT_I4 (LONG)
+vt:8        // VT_BSTR
+----------------------------------
+■caoTask.Start 1
+----------------------------------
+ubuntu@rosservice call /bcap_service '{func_id: 88, vntArgs: [{vt: 3, value: "<task handle>"}, {vt: 3, value: "1"}, {vt: 8, value: ""}] }'
+func_id:88  // ID_TASK_START
+vt:3        // VT_I4 (LONG)
+vt:8        // VT_BSTR
+----------------------------------
+■caoTask.Stop 1
+----------------------------------
+ubuntu@rosservice call /bcap_service '{func_id: 89, vntArgs: [{vt: 3, value: "<task handle>"}, {vt: 3, value: "1"}, {vt: 8, value: ""}] }'
+func_id:89  // ID_TASK_STOP
+vt:3        // VT_I4 (LONG)
+vt:8        // VT_BSTR
+----------------------------------
+■Task Release
+----------------------------------
+ubuntu@rosservice call /bcap_service '{func_id: 99, vntArgs: [{vt: 3, value: "<task handle>"}] }'
+func_id:99  // ID_TASK_RELEASE
+vt:3        // VT_I4 (LONG)
+----------------------------------
+■AddExtension "Hand",""
+----------------------------------
+ubuntu@rosservice call /bcap_service '{func_id: 5, vntArgs: [{vt: 3, value: "<controller handle>"}, {vt: 8, value: "Hand"}, {vt: 8, value: ""}] }'
+func_id:5 // ID_CONTROLLER_GETEXTENSION
+vt:3        // VT_I4 (LONG)
+vt:8        // VT_BSTR
+If you use VS or HS and so on.(NOT COBOTTA)
+If you get the error[], could you set below parameter?
+(3)VRC Setting(ID:5801, ID:4123 for COBOTTA)
+Operation path : [F6 Setting]-[F2 System info]-[General]-[F6 VRC Setting]
+[Slave mode command limit set] is used to restrict available commands under the slave mode. Selecting "1: Enable" will restrict the commands. 
+NOTE:To edit the items of the [F6 VRC Setting], the log-in level needs to be the Maintainer.
+----------------------------------
+■caoExtension.Execute "Motor",1
+----------------------------------
+ubuntu@rosservice call /bcap_service '{func_id: 28, vntArgs: [{vt: 3, value: "<extension handle>"}, {vt: 8, value: "Motor"}, {vt: 3, value: "1"}] }'
+func_id:28  // ID_EXTENSION_EXECUTE
+vt:3        // VT_I4 (LONG)
+vt:8        // VT_BSTR
+----------------------------------
+■caoExtension "Chuck",0
+----------------------------------
+ubuntu@rosservice call /bcap_service '{func_id: 28, vntArgs: [{vt: 3, value: "<extension handle>"}, {vt: 8, value: "Chuck"}, {vt: 3, value: "0"}] }'
+func_id:28  // ID_EXTENSION_EXECUTE
+vt:3        // VT_I4 (LONG)
+vt:8        // VT_BSTR
+
+Atsuko Sugano  1時間前
+[b-CAP]使用可能なデータ型式
+■Available data types
+Datatype      | Value | Description
+VT_I2        |     2 | Short integer
+VT_I4        |    3 | Long integer
+VT_R4       |    4 | Single-precision floating point 
+VT_R8       |    5 | Double-precision floating point 
+VT_CY         |    6 | Currency type 
+VT_DATE      |    7 | Date type
+VT_BSTR     |    8 | String type
+VT_BOOL    |   11  | Boolean type
+VT_VARIANT  |  12 | VARIANT type
+VT_UI1      |   17 | Binary
+VT_ARRAY   | 8192 | Array
