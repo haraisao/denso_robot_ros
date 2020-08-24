@@ -29,6 +29,7 @@
 
 // Message (std_msgs)
 #include <std_msgs/Int32.h>
+#include <std_msgs/UInt32.h>
 #include <std_msgs/Float64MultiArray.h>
 using namespace std_msgs;
 
@@ -125,6 +126,8 @@ namespace denso_robot_control
     ros::Publisher  m_pubHandIO;
     ros::Publisher  m_pubRecvUserIO;
     ros::Publisher  m_pubCurrent;
+    /// for Cobotta Hand (I.Hara)
+    ros::Publisher  m_pubError;
 
     boost::mutex m_mtxMode;
   };

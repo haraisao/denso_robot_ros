@@ -200,6 +200,8 @@ namespace denso_robot_control
     m_subChangeMode = nh.subscribe<Int32>(
         "ChangeMode", 1, &DensoRobotHW::Callback_ChangeMode, this);
     m_pubCurMode = nh.advertise<Int32>("CurMode", 1);
+
+    m_pubError = nh.advertise<UInt32>("ErrorCode", 1);
     
     hr = ChangeModeWithClearError(DensoRobotRC8::SLVMODE_SYNC_WAIT
 	| DensoRobotRC8::SLVMODE_POSE_J);
@@ -392,6 +394,11 @@ namespace denso_robot_control
       }
       else if(FAILED(hr) && (hr != E_BUF_FULL)) {
         ROS_ERROR("Failed to write. (%X)", hr);
+        {
+          UInt32 msg;
+          msg.data = hr;
+          m_pubError.publish(msg);
+        }
 
         VARIANT_Ptr vntVal(new VARIANT());
         hr = m_varErr->ExecGetValue(vntVal);
