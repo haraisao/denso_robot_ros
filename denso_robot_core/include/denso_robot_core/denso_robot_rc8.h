@@ -103,9 +103,10 @@ public:
 
   HRESULT ExecSlaveMove(const std::vector<double>& pose, std::vector<double>& joint);
 
-  // for Cobotta(I.Hara)
   HRESULT CobottaHandIO(unsigned long handle, int arg);
   HRESULT CobottaMotor(int arg);
+  HRESULT CobottaManualResetPreparation();
+  HRESULT CobottaMotionPreparation();
 
   int get_SendFormat() const;
   void put_SendFormat(int format);

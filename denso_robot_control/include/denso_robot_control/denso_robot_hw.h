@@ -29,7 +29,6 @@
 
 // Message (std_msgs)
 #include <std_msgs/Int32.h>
-#include <std_msgs/UInt32.h>
 #include <std_msgs/Float64MultiArray.h>
 using namespace std_msgs;
 
@@ -37,7 +36,8 @@ using namespace std_msgs;
 #include <hardware_interface/joint_state_interface.h>
 #include <hardware_interface/robot_hw.h>
 
-#include <joint_limits_interface/joint_limits_interface.h>
+//#include <joint_limits_interface/joint_limits_interface_ex.h>
+#include "denso_robot_control/joint_limits_interface_ex.h"
 
 #include "denso_robot_core/denso_robot_core.h"
 #include "denso_robot_core/denso_controller.h"
@@ -75,8 +75,8 @@ namespace denso_robot_control
 
     bool is_SlaveSyncMode() const;
 
-    // for Cobotta Hand (I.Hara)
-    void init_CobottaHand();
+    void init_cobotta_hand();
+    void register_joint_handle();
 
   private:
     HRESULT ChangeModeWithClearError(int mode);
@@ -88,14 +88,19 @@ namespace denso_robot_control
     void Callback_HandIO(const Int32::ConstPtr& msg);
     void Callback_SendUserIO(const UserIO::ConstPtr& msg);
     void Callback_RecvUserIO(const UserIO::ConstPtr& msg);    
-    // for Cobotta Hand (I.Hara)
-    void Callback_Cobotta_HandIO(const Int32::ConstPtr& msg);    
-    void Callback_Cobotta_Motor(const Int32::ConstPtr& msg);    
+    void Callback_Cobotta_HandIO(const Int32::ConstPtr& msg);
+    void Callback_Cobotta_Motor(const Int32::ConstPtr& msg);
+
 
   private:
     hardware_interface::JointStateInterface m_JntStInterface;
     hardware_interface::PositionJointInterface m_PosJntInterface;
+    //std::vector<joint_limits_interface::PositionJointSoftLimitsInterface> m_joint_limits_interfaces;
+    joint_limits_interface::PositionJointSoftLimitsInterfaceEx m_joint_limits_interface;
+
+    int m_debug;
     double m_cmd[JOINT_MAX];
+    double m_cmd_prev[JOINT_MAX];
     double m_pos[JOINT_MAX];
     double m_vel[JOINT_MAX];
     double m_eff[JOINT_MAX];
@@ -117,7 +122,7 @@ namespace denso_robot_control
     ros::Subscriber m_subHandIO;
     ros::Subscriber m_subSendUserIO;
     ros::Subscriber m_subRecvUserIO;
-    /// for Cobotta Hand (I.Hara)
+
     ros::Subscriber m_subCobottaHandIO;
     ros::Subscriber m_subCobottaMotor;
 
@@ -126,7 +131,7 @@ namespace denso_robot_control
     ros::Publisher  m_pubHandIO;
     ros::Publisher  m_pubRecvUserIO;
     ros::Publisher  m_pubCurrent;
-    /// for Cobotta Hand (I.Hara)
+
     ros::Publisher  m_pubError;
 
     boost::mutex m_mtxMode;

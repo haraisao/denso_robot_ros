@@ -22,21 +22,58 @@
  * THE SOFTWARE.
  */
 
+#include <unistd.h>
 #include <ros/ros.h>
+#include <iostream>
+#include <mutex>
 #include <controller_manager/controller_manager.h>
 #include "denso_robot_control/denso_robot_hw.h"
 
+#include "std_msgs/String.h"
+
+static int pause_flag = 0;
+
+std::mutex m;
+
+denso_robot_control::DensoRobotHW drobo;
+ros::Time start;
+controller_manager::ControllerManager *cm;
+
+void cmdRequestCallback(const std_msgs::String::ConstPtr& msg)
+{
+   std::lock_guard<std::mutex> lock(m);
+   if (msg->data == "pause"){
+     ROS_INFO("pause control");
+     pause_flag = 1;
+   }else if (msg->data == "resume"){
+     ROS_INFO("resume control");
+     pause_flag = 0;
+   }else if (msg->data == "reset"){
+     ROS_INFO("reset");
+     drobo.register_joint_handle();
+     start = drobo.getTime();
+   }else{
+     ROS_INFO("Invalid command: %s", msg->data.c_str());
+   }
+   return;
+}
+
+/*
+
+*/
 int main(int argc, char *argv[])
 {
   ros::init(argc, argv, "denso_robot_control");
   ros::NodeHandle nh;
 
-  denso_robot_control::DensoRobotHW drobo;
+  //denso_robot_control::DensoRobotHW drobo;
   HRESULT hr = drobo.Initialize();
-  // for Cobotta (I.Hara)
   if (nh.getNamespace() == "/cobotta"){
-     drobo.init_CobottaHand();
-  } 
+     drobo.init_cobotta_hand();
+  }
+
+  ros::Subscriber sub  = nh.subscribe("control_cmd", 10, cmdRequestCallback);
+
   if(SUCCEEDED(hr)) {
       controller_manager::ControllerManager cm(&drobo, nh);
 
@@ -44,28 +81,33 @@ int main(int argc, char *argv[])
       ros::AsyncSpinner spinner(1);
       spinner.start();
 
-      ros::Time start = drobo.getTime();
+      //ros::Time start = drobo.getTime();
+      start = drobo.getTime();
+      ros::Time tm1 = drobo.getTime();
+      ros::Duration dt = drobo.getPeriod();
+
       while(ros::ok())
       {
         ros::Time now = drobo.getTime();
-        ros::Duration dt = drobo.getPeriod();
+        {
+          std::lock_guard<std::mutex> lock(m);
+          drobo.read(now, dt);
+          cm.update(now, dt);
 
-        drobo.read(now, dt);
+          ros::Duration diff = now - start;
+          if(diff.toSec() > 5 && pause_flag == 0) {
+            drobo.write(now, dt);
+          } else {
+            rate.sleep();
+            continue;
+          }
 
-        cm.update(now, dt);
-
-        ros::Duration diff = now - start;
-        if(diff.toSec() > 5) {
-          drobo.write(now, dt);
-        } else {
-          rate.sleep();
-          continue;
         }
-
         if (!drobo.is_SlaveSyncMode())
         {
           rate.sleep();
         }
+//        ros::spinOnce();
       }
       spinner.stop();
   }

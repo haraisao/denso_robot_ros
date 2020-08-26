@@ -592,6 +592,8 @@ HRESULT DensoRobotRC8::ChangeMode(int mode)
     m_vecService[DensoBase::SRV_ACT]->put_Timeout(m_memTimeout);
     m_vecService[DensoBase::SRV_ACT]->put_Retry(m_memRetry);
 
+    ROS_INFO("bcap-slave timeout  %d msec, retry %d ", m_memTimeout, m_memRetry);
+
     hr = ExecSlaveMode("slvChangeMode", mode);
     ExecGiveArm();
   }
@@ -1552,6 +1554,76 @@ HRESULT DensoRobotRC8::CobottaMotor(int arg)
         }else{
           vntTmp->bstrVal = SysAllocString(L"0");
         }
+        break;
+    }
+    vntArgs.push_back(*vntTmp.get());
+  }
+
+  hr = m_vecService[DensoBase::SRV_WATCH]->ExecFunction(ID_ROBOT_EXECUTE, vntArgs, vntRet);
+
+  return hr;
+}
+
+HRESULT DensoRobotRC8::CobottaManualResetPreparation()
+{
+  HRESULT hr = S_OK;
+  int argc;
+  VARIANT_Vec vntArgs;
+  VARIANT *pvnt;
+  VARIANT_Ptr vntRet(new VARIANT());
+
+  VariantInit(vntRet.get());
+
+  for(argc = 0; argc < 3; argc++) {
+    VARIANT_Ptr vntTmp(new VARIANT());
+    VariantInit(vntTmp.get());
+
+    switch(argc) {
+      case 0:
+        vntTmp->vt = VT_UI4;
+        vntTmp->ulVal = m_vecHandle[DensoBase::SRV_WATCH];
+        break;
+      case 1:
+        vntTmp->vt = VT_BSTR;
+        vntTmp->bstrVal = SysAllocString(L"ManualResetPreparation");
+        break;
+      case 2:
+        vntTmp->vt = VT_EMPTY;
+        break;
+    }
+    vntArgs.push_back(*vntTmp.get());
+  }
+
+  hr = m_vecService[DensoBase::SRV_WATCH]->ExecFunction(ID_ROBOT_EXECUTE, vntArgs, vntRet);
+
+  return hr;
+}
+
+HRESULT DensoRobotRC8::CobottaMotionPreparation()
+{
+  HRESULT hr = S_OK;
+  int argc;
+  VARIANT_Vec vntArgs;
+  VARIANT *pvnt;
+  VARIANT_Ptr vntRet(new VARIANT());
+
+  VariantInit(vntRet.get());
+
+  for(argc = 0; argc < 3; argc++) {
+    VARIANT_Ptr vntTmp(new VARIANT());
+    VariantInit(vntTmp.get());
+
+    switch(argc) {
+      case 0:
+        vntTmp->vt = VT_UI4;
+        vntTmp->ulVal = m_vecHandle[DensoBase::SRV_WATCH];
+        break;
+      case 1:
+        vntTmp->vt = VT_BSTR;
+        vntTmp->bstrVal = SysAllocString(L"MotionPreparation");
+        break;
+      case 2:
+        vntTmp->vt = VT_EMPTY;
         break;
     }
     vntArgs.push_back(*vntTmp.get());

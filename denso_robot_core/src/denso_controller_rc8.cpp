@@ -67,10 +67,10 @@ HRESULT DensoControllerRC8::AddController()
           ss << ros::this_node::getNamespace() << m_name << srvs;
           strTmp = ss.str();
         }
+         
       } else {
         strTmp = CTRL_CONNECT_OPTION[argc];
       }
-
       vntTmp->bstrVal = ConvertStringToBSTR(strTmp);
 
       vntArgs.push_back(*vntTmp.get());
@@ -81,7 +81,6 @@ HRESULT DensoControllerRC8::AddController()
 
     m_vecHandle.push_back(vntRet->ulVal);
   }
-
   return hr;
 }
 
@@ -107,7 +106,6 @@ HRESULT DensoControllerRC8::AddRobot(XMLElement *xmlElem)
       m_vecRobot.push_back(rob);
     }
   }
-
   return hr;
 }
 

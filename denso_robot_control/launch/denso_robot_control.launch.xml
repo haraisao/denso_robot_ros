@@ -6,4 +6,8 @@
   <!-- Recieve format -->
   <arg name="recv_format" default="292" />
   <param name="recv_format" value="$(arg recv_format)" />
+
+  <!-- Recieve format -->
+  <arg name="joint_limits_scaling" default="1.0" />
+  <param name="joint_limits_scaling" value="$(arg joint_limits_scaling)" />
 </launch>
