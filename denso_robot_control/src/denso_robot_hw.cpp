@@ -493,6 +493,9 @@ namespace denso_robot_control
     m_subCobottaHandIO = nh.subscribe<Int32>(
          "Cobotta_HandIO", 1, &DensoRobotHW::Callback_Cobotta_HandIO, this);
 
+    m_subCobottaHandIO_Z = nh.subscribe<Int32>(
+         "Cobotta_HandIO_Z", 1, &DensoRobotHW::Callback_Cobotta_HandIO_Z, this);
+
     m_subCobottaMotor = nh.subscribe<Int32>(
          "Cobotta_Motor", 1, &DensoRobotHW::Callback_Cobotta_Motor, this);
     return;
@@ -500,7 +503,13 @@ namespace denso_robot_control
 
   void DensoRobotHW::Callback_Cobotta_HandIO(const Int32::ConstPtr& msg)
   {
-    m_rob->CobottaHandIO(m_ctrl->getControlHandle(), msg->data);
+    m_rob->CobottaHandIO(m_ctrl->getControlHandle(), msg->data, 0);
+    return;
+  }
+
+  void DensoRobotHW::Callback_Cobotta_HandIO_Z(const Int32::ConstPtr& msg)
+  {
+    m_rob->CobottaHandIO(m_ctrl->getControlHandle(), msg->data, 1);
     return;
   }
 

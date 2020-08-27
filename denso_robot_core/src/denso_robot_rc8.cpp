@@ -1449,7 +1449,7 @@ int DensoRobotRC8::get_Timestamp() const
 }
   
 /********** for COBOTTA *******/
-HRESULT DensoRobotRC8::CobottaHandIO(unsigned long handle, int arg)
+HRESULT DensoRobotRC8::CobottaHandIO(unsigned long handle, int arg, int flag)
 {
   HRESULT hr = S_OK;
   int argc;
@@ -1473,7 +1473,11 @@ HRESULT DensoRobotRC8::CobottaHandIO(unsigned long handle, int arg)
         if (arg < 0){
           vntTmp->bstrVal = SysAllocString(L"HandMoveA");
         }else{
-          vntTmp->bstrVal = SysAllocString(L"HandMoveAH");
+          if (flag == 0){
+            vntTmp->bstrVal = SysAllocString(L"HandMoveAH");
+          }else{
+            vntTmp->bstrVal = SysAllocString(L"HandMoveZH");
+          }
         }
         break;
       case 2:
@@ -1490,21 +1494,42 @@ HRESULT DensoRobotRC8::CobottaHandIO(unsigned long handle, int arg)
 
           SafeArrayUnaccessData(vntTmp->parray);
         }else{
-          vntTmp->parray = SafeArrayCreateVector(VT_VARIANT, 0, 4);
-          SafeArrayAccessData(vntTmp->parray, (void**)&pvnt);
+          if (flag == 0){
+            vntTmp->parray = SafeArrayCreateVector(VT_VARIANT, 0, 4);
+            SafeArrayAccessData(vntTmp->parray, (void**)&pvnt);
 
-          pvnt[0].vt = VT_R8;
-          pvnt[0].dblVal = (double)arg;
+            pvnt[0].vt = VT_R8;
+            pvnt[0].dblVal = (double)arg;
 
-          pvnt[1].vt = VT_UI1;
-          pvnt[1].bVal = 100;
+            pvnt[1].vt = VT_UI1;
+            pvnt[1].bVal = 100;
 
-          pvnt[2].vt = VT_R8;
-          pvnt[2].dblVal = 20.0;
+            pvnt[2].vt = VT_R8;
+            pvnt[2].dblVal = 20.0;
 
-          pvnt[3].vt = VT_BSTR;
-          pvnt[3].bstrVal = SysAllocString(L"Next");
-          SafeArrayUnaccessData(vntTmp->parray);
+            pvnt[3].vt = VT_BSTR;
+            pvnt[3].bstrVal = SysAllocString(L"DetectOn");
+            SafeArrayUnaccessData(vntTmp->parray);
+          }else{
+            vntTmp->parray = SafeArrayCreateVector(VT_VARIANT, 0, 5);
+            SafeArrayAccessData(vntTmp->parray, (void**)&pvnt);
+
+            pvnt[0].vt = VT_R8;
+            pvnt[0].dblVal = (double)(arg - 5);
+
+            pvnt[1].vt = VT_R8;
+            pvnt[1].dblVal = (double)(arg + 5);
+
+            pvnt[2].vt = VT_R8;
+            pvnt[2].dblVal = 20.0;
+
+            pvnt[3].vt = VT_BOOL;
+            pvnt[3].boolVal = VARIANT_TRUE;
+
+            pvnt[4].vt = VT_BSTR;
+            pvnt[4].bstrVal = SysAllocString(L"DetectOn");
+            SafeArrayUnaccessData(vntTmp->parray);
+          }
         }
 
         break;

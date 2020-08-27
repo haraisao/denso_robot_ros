@@ -89,6 +89,7 @@ namespace denso_robot_control
     void Callback_SendUserIO(const UserIO::ConstPtr& msg);
     void Callback_RecvUserIO(const UserIO::ConstPtr& msg);    
     void Callback_Cobotta_HandIO(const Int32::ConstPtr& msg);
+    void Callback_Cobotta_HandIO_Z(const Int32::ConstPtr& msg);
     void Callback_Cobotta_Motor(const Int32::ConstPtr& msg);
 
 
@@ -124,6 +125,7 @@ namespace denso_robot_control
     ros::Subscriber m_subRecvUserIO;
 
     ros::Subscriber m_subCobottaHandIO;
+    ros::Subscriber m_subCobottaHandIO_Z;
     ros::Subscriber m_subCobottaMotor;
 
     ros::Publisher  m_pubCurMode;

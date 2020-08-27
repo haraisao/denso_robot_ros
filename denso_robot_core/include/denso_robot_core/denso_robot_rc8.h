@@ -103,7 +103,7 @@ public:
 
   HRESULT ExecSlaveMove(const std::vector<double>& pose, std::vector<double>& joint);
 
-  HRESULT CobottaHandIO(unsigned long handle, int arg);
+  HRESULT CobottaHandIO(unsigned long handle, int arg, int flag=0);
   HRESULT CobottaMotor(int arg);
   HRESULT CobottaManualResetPreparation();
   HRESULT CobottaMotionPreparation();
