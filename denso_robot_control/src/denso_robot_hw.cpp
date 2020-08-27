@@ -348,12 +348,6 @@ namespace denso_robot_control
       if(FAILED(hr)) {
         ROS_ERROR("Failed to get current joint. (%X)", hr);
       }
-/*
-      for(int i = 0; i < m_robJoints; i++) {
-	    std::cerr << i << ":" << m_cmd[i] - m_pos[i] << ", ";
-      }
-	  std::cerr << std::endl;
-*/
     }
 
     for(int i = 0; i < m_robJoints; i++) {
@@ -376,7 +370,6 @@ namespace denso_robot_control
   {
     boost::mutex::scoped_lock lockMode(m_mtxMode);
     
-    int flag2=0;
     if(m_eng->get_Mode() != DensoRobotRC8::SLVMODE_NONE) {
       //ROS_INFO("SLV_MODE: %d", m_eng->get_Mode() );
       m_joint_limits_interface.enforceLimits(period);
@@ -385,13 +378,6 @@ namespace denso_robot_control
       int bits = 0x0000;
       
       for(int i = 0; i < m_robJoints; i++) {
-	    //std::cerr << i << ":" << m_cmd[i] - m_pos[i] << ", ";
-#if DEBUG
-	    if(m_cmd[i] != m_cmd_prev[i]){
-	      std::cerr << i << ":" <<m_cmd[i] << " ";
-	      flag2=1;
-	    }
-#endif
         switch(m_type[i]){
           case 0: // prismatic
             pose[i] = M2MM(m_cmd[i]);
@@ -407,10 +393,6 @@ namespace denso_robot_control
         bits |= (1 << i);
 	    m_cmd_prev[i] = m_cmd[i];
       }
-      //std::cerr << std::endl;
-#if DEBUG
-      if(flag2 == 1) std::cerr << std::endl;
-#endif
 
       pose.push_back(0x400000 | bits);
       HRESULT hr = m_rob->ExecSlaveMove(pose, m_joint);
