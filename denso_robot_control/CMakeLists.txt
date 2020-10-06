@@ -11,6 +11,17 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   transmission_interface
+  message_generation
+)
+
+add_service_files(
+  FILES
+  HandIO.srv
+)
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs
 )
 
 catkin_package(
@@ -18,6 +29,7 @@ catkin_package(
     denso_robot_core hardware_interface
     joint_limits_interface roscpp std_msgs
     transmission_interface
+    message_runtime
 )
 
 ###########

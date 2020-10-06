@@ -480,6 +480,9 @@ namespace denso_robot_control
 
     m_subCobottaMotor = nh.subscribe<Int32>(
          "Cobotta_Motor", 1, &DensoRobotHW::Callback_Cobotta_Motor, this);
+
+    m_srvCobottaHand = nh.advertiseService(
+         "Cobotta_Hand", &DensoRobotHW::Service_Cobotta_Hand, this);
     return;
   }
 
@@ -543,5 +546,12 @@ namespace denso_robot_control
   }
   
   
+  bool DensoRobotHW::Service_Cobotta_Hand(denso_robot_control::HandIO::Request &req, denso_robot_control::HandIO::Response &res )
+  {
+    
+    res.value = m_rob->CobottaHandState( m_ctrl->getControlHandle(), req.cmd);
+
+    return true;
+  }
 
 } // denso_robot_control

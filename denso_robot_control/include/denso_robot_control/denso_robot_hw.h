@@ -44,6 +44,9 @@ using namespace std_msgs;
 #include "denso_robot_core/denso_robot_rc8.h"
 #include "denso_robot_core/denso_variable.h"
 #include "denso_robot_core/UserIO.h"
+
+#include "denso_robot_control/HandIO.h"
+
 using namespace denso_robot_core;
 
 #include <boost/thread.hpp>
@@ -91,6 +94,8 @@ namespace denso_robot_control
     void Callback_Cobotta_HandIO(const Int32::ConstPtr& msg);
     void Callback_Cobotta_HandIO_Z(const Int32::ConstPtr& msg);
     void Callback_Cobotta_Motor(const Int32::ConstPtr& msg);
+    bool Service_Cobotta_Hand(denso_robot_control::HandIO::Request &req,
+		              denso_robot_control::HandIO::Response &res );
 
 
   private:
@@ -127,6 +132,8 @@ namespace denso_robot_control
     ros::Subscriber m_subCobottaHandIO;
     ros::Subscriber m_subCobottaHandIO_Z;
     ros::Subscriber m_subCobottaMotor;
+
+    ros::ServiceServer m_srvCobottaHand;
 
     ros::Publisher  m_pubCurMode;
     ros::Publisher  m_pubMiniIO;

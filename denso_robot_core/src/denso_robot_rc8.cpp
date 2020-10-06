@@ -1549,6 +1549,65 @@ HRESULT DensoRobotRC8::CobottaHandIO(unsigned long handle, int arg, int flag)
   return hr;
 }
 
+int DensoRobotRC8::CobottaHandState(unsigned long handle, int cmd)
+{
+  HRESULT hr = S_OK;
+  int argc;
+  int res;
+  VARIANT_Vec vntArgs;
+  VARIANT *pvnt;
+  VARIANT_Ptr vntRet(new VARIANT());
+
+  VariantInit(vntRet.get());
+
+  for(argc = 0; argc < BCAP_ROBOT_EXECUTE_ARGS; argc++) {
+    VARIANT_Ptr vntTmp(new VARIANT());
+    VariantInit(vntTmp.get());
+
+    switch(argc) {
+      case 0:
+        vntTmp->vt = VT_UI4;
+        vntTmp->ulVal = handle;
+        break;
+      case 1:
+        vntTmp->vt = VT_BSTR;
+	if (cmd == 0){
+          vntTmp->bstrVal = SysAllocString(L"HandCurPos");
+	}else if(cmd == 1){
+          vntTmp->bstrVal = SysAllocString(L"HandHoldState");
+	}else if(cmd == 2){
+          vntTmp->bstrVal = SysAllocString(L"HandInposState");
+	}else if(cmd == 3){
+          vntTmp->bstrVal = SysAllocString(L"HandZonState");
+	}else{
+          vntTmp->bstrVal = SysAllocString(L"HandBusyState");
+	}
+        break;
+    }
+
+    vntArgs.push_back(*vntTmp.get());
+  }
+
+  hr = m_vecService[DensoBase::SRV_WATCH]->ExecFunction(ID_CONTROLLER_EXECUTE, vntArgs, vntRet);
+
+  if(SUCCEEDED(hr)) {
+    if(vntRet->vt == VT_R8){
+      res = int(round(vntRet->dblVal));
+    }else if(vntRet->vt == VT_BOOL){
+      if (vntRet->boolVal == VARIANT_TRUE){
+	res = 1;
+      }else{
+	res = 0;
+      }
+    }
+  }else{
+    std::cerr << "Fail to execute HandState" << std::endl;
+    res = -1;
+  }
+
+  return res;
+}
+
 HRESULT DensoRobotRC8::CobottaMotor(int arg)
 {
   HRESULT hr = S_OK;
