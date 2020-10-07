@@ -483,6 +483,9 @@ namespace denso_robot_control
 
     m_srvCobottaHand = nh.advertiseService(
          "Cobotta_Hand", &DensoRobotHW::Service_Cobotta_Hand, this);
+
+    m_srvGetVariable = nh.advertiseService(
+         "GetVariable", &DensoRobotHW::Service_GetVariable, this);
     return;
   }
 
@@ -552,6 +555,19 @@ namespace denso_robot_control
     res.value = m_rob->CobottaHandState( m_ctrl->getControlHandle(), req.cmd);
 
     return true;
+  }
+
+  bool DensoRobotHW::Service_GetVariable(denso_robot_control::GetVariable::Request &req, denso_robot_control::GetVariable::Response &res )
+  {
+    HRESULT result; 
+
+    result = m_rob->ControllerGetVariable(m_ctrl->getControlHandle(),req.name.c_str(), res.value);
+
+    if(SUCCEEDED(result)){
+      return true;
+    }else{
+      return false;
+    }
   }
 
 } // denso_robot_control

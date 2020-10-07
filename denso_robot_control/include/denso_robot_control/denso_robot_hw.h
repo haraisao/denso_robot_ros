@@ -46,6 +46,7 @@ using namespace std_msgs;
 #include "denso_robot_core/UserIO.h"
 
 #include "denso_robot_control/HandIO.h"
+#include "denso_robot_control/GetVariable.h"
 
 using namespace denso_robot_core;
 
@@ -97,6 +98,8 @@ namespace denso_robot_control
     bool Service_Cobotta_Hand(denso_robot_control::HandIO::Request &req,
 		              denso_robot_control::HandIO::Response &res );
 
+    bool Service_GetVariable(denso_robot_control::GetVariable::Request &req,
+		              denso_robot_control::GetVariable::Response &res );
 
   private:
     hardware_interface::JointStateInterface m_JntStInterface;
@@ -134,6 +137,7 @@ namespace denso_robot_control
     ros::Subscriber m_subCobottaMotor;
 
     ros::ServiceServer m_srvCobottaHand;
+    ros::ServiceServer m_srvGetVariable;
 
     ros::Publisher  m_pubCurMode;
     ros::Publisher  m_pubMiniIO;

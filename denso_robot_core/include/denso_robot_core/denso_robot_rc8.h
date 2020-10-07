@@ -26,6 +26,7 @@
 #define DENSO_ROBOT_RC8_H
 
 #include <boost/thread.hpp>
+#include <vector>
 #include "denso_robot_core/denso_robot.h"
 
 #define S_BUF_FULL (0x0F200501)
@@ -108,6 +109,7 @@ public:
   HRESULT CobottaMotor(int arg);
   HRESULT CobottaManualResetPreparation();
   HRESULT CobottaMotionPreparation();
+  HRESULT ControllerGetVariable(unsigned long handle, const char *name, std::vector<float>& res);
 
   int get_SendFormat() const;
   void put_SendFormat(int format);
@@ -177,6 +179,8 @@ private:
   int m_recv_userio_offset, m_recv_userio_size;
   std::vector<uint8_t> m_send_userio, m_recv_userio;
   std::vector<double> m_position, m_joint, m_trans, m_current;
+
+  std::map<std::string, uint32_t>m_tp_vars;
 };
 
 typedef boost::shared_ptr<DensoRobotRC8> DensoRobotRC8_Ptr;
