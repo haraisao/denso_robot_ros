@@ -101,6 +101,9 @@ namespace denso_robot_control
     bool Service_GetVariable(denso_robot_control::GetVariable::Request &req,
 		              denso_robot_control::GetVariable::Response &res );
 
+    bool Service_GetCurrentPos(denso_robot_control::GetVariable::Request &req,
+		              denso_robot_control::GetVariable::Response &res );
+
   private:
     hardware_interface::JointStateInterface m_JntStInterface;
     hardware_interface::PositionJointInterface m_PosJntInterface;
@@ -138,6 +141,7 @@ namespace denso_robot_control
 
     ros::ServiceServer m_srvCobottaHand;
     ros::ServiceServer m_srvGetVariable;
+    ros::ServiceServer m_srvGetCurrentPos;
 
     ros::Publisher  m_pubCurMode;
     ros::Publisher  m_pubMiniIO;

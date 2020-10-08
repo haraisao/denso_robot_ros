@@ -109,7 +109,6 @@ public:
   HRESULT CobottaMotor(int arg);
   HRESULT CobottaManualResetPreparation();
   HRESULT CobottaMotionPreparation();
-  HRESULT ControllerGetVariable(unsigned long handle, const char *name, std::vector<float>& res);
 
   int get_SendFormat() const;
   void put_SendFormat(int format);
@@ -180,7 +179,6 @@ private:
   std::vector<uint8_t> m_send_userio, m_recv_userio;
   std::vector<double> m_position, m_joint, m_trans, m_current;
 
-  std::map<std::string, uint32_t>m_tp_vars;
 };
 
 typedef boost::shared_ptr<DensoRobotRC8> DensoRobotRC8_Ptr;

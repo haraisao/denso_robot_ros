@@ -211,6 +211,22 @@ namespace denso_robot_control
       return hr;
     }
 
+    /*******************/
+    hr = m_rob->AddVariable("@CURRENT_POSITION");
+    if(SUCCEEDED(hr)) {
+      DensoVariable_Ptr pVar;
+      hr = m_rob->get_Variable("@CURRENT_POSITION", &pVar);
+      if(SUCCEEDED(hr)) {
+        VARIANT_Ptr vntVal(new VARIANT());
+        hr = pVar->ExecGetValue(vntVal);
+      }
+    }
+    if(FAILED(hr)) {
+      ROS_ERROR("[INIT]Failed to get current position. (%X)", hr);
+      return hr;
+    }
+    /********************/
+
     m_rob->put_SendFormat(m_sendfmt);
     m_sendfmt = m_rob->get_SendFormat();
 
@@ -486,6 +502,9 @@ namespace denso_robot_control
 
     m_srvGetVariable = nh.advertiseService(
          "GetVariable", &DensoRobotHW::Service_GetVariable, this);
+
+    m_srvGetCurrentPos = nh.advertiseService(
+         "GetCurrentPos", &DensoRobotHW::Service_GetCurrentPos, this);
     return;
   }
 
@@ -549,7 +568,9 @@ namespace denso_robot_control
   }
   
   
-  bool DensoRobotHW::Service_Cobotta_Hand(denso_robot_control::HandIO::Request &req, denso_robot_control::HandIO::Response &res )
+  bool DensoRobotHW::Service_Cobotta_Hand(
+		  denso_robot_control::HandIO::Request &req,
+		  denso_robot_control::HandIO::Response &res )
   {
     
     res.value = m_rob->CobottaHandState( m_ctrl->getControlHandle(), req.cmd);
@@ -557,17 +578,101 @@ namespace denso_robot_control
     return true;
   }
 
-  bool DensoRobotHW::Service_GetVariable(denso_robot_control::GetVariable::Request &req, denso_robot_control::GetVariable::Response &res )
+  bool DensoRobotHW::Service_GetVariable(
+		  denso_robot_control::GetVariable::Request &req,
+		  denso_robot_control::GetVariable::Response &res )
   {
-    HRESULT result; 
+    HRESULT hr; 
+    DensoVariable_Ptr pVar;
+    hr =  m_ctrl->get_Variable(req.name, &pVar);
+    if(FAILED(hr)) {
+      hr = m_ctrl->AddVariable(req.name);
+      if(SUCCEEDED(hr)) {
+        hr =  m_ctrl->get_Variable(req.name, &pVar);
+      }else{
+       std::cerr << "Fail to add Variable" << std::endl;
+      }
+    }
 
-    result = m_rob->ControllerGetVariable(m_ctrl->getControlHandle(),req.name.c_str(), res.value);
+    if(FAILED(hr)) {
+      return false;
+    }else{
+      VARIANT_Ptr vntVal(new VARIANT());
+      hr = pVar->ExecGetValue(vntVal);
+      if(SUCCEEDED(hr)) {
+	if (vntVal->vt && 0x2000){
+          SAFEARRAY *cur = vntVal->parray;
 
-    if(SUCCEEDED(result)){
+          if( cur->vt == VT_R4){
+            int nData= cur->rgsabound->cElements;
+            float *vals = (float *)(cur->pvData);
+
+            for(int i=0; i < nData; i++){
+              //std::cerr << i<< ": " << vals[i] << std::endl;
+              res.value.push_back(vals[i]);
+            }
+          }else if( cur->vt == VT_R8){
+            int nData= cur->rgsabound->cElements;
+            double *vals = (double *)(cur->pvData);
+
+            for(int i=0; i < nData; i++){
+              // std::cerr << i<< ": " << vals[i] << std::endl;
+              res.value.push_back(vals[i]);
+            }
+          }
+	}else{
+          std::cerr << "Error: Invalid data type" << std::endl;
+          return false;
+	}
+      }
+
+    }
+    return true;
+  }
+
+  bool DensoRobotHW::Service_GetCurrentPos(
+		  denso_robot_control::GetVariable::Request &req,
+		  denso_robot_control::GetVariable::Response &res )
+  {
+    HRESULT hr; 
+
+    DensoVariable_Ptr pVar;
+    hr = m_rob->get_Variable("@CURRENT_POSITION", &pVar);
+
+    if(SUCCEEDED(hr)) {
+      VARIANT_Ptr vntVal(new VARIANT());
+      hr = pVar->ExecGetValue(vntVal);
+      if(SUCCEEDED(hr)) {
+	if (vntVal->vt && 0x2000){
+          SAFEARRAY *cur = vntVal->parray;
+          if( cur->vt == VT_R4){
+            int nData= cur->rgsabound->cElements;
+            float *vals = (float *)(cur->pvData);
+
+            for(int i=0; i < nData; i++){
+              //std::cerr << i<< ": " << vals[i] << std::endl;
+              res.value.push_back(vals[i]);
+            }
+          }else if( cur->vt == VT_R8){
+            int nData= cur->rgsabound->cElements;
+            double *vals = (double *)(cur->pvData);
+
+            for(int i=0; i < nData; i++){
+              // std::cerr << i<< ": " << vals[i] << std::endl;
+              res.value.push_back(vals[i]);
+            }
+          }
+	}
+      }
+    }else{
+      std::cerr << "Fail to get current pos" << std::endl;
+      return false;
+    }
+
+    if(SUCCEEDED(hr)){
       return true;
     }else{
       return false;
     }
   }
-
 } // denso_robot_control
