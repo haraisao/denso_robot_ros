@@ -18,6 +18,7 @@ add_service_files(
   FILES
   HandIO.srv
   GetVariable.srv
+  SetVariable.srv
 )
 
 generate_messages(

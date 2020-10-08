@@ -505,6 +505,10 @@ namespace denso_robot_control
 
     m_srvGetCurrentPos = nh.advertiseService(
          "GetCurrentPos", &DensoRobotHW::Service_GetCurrentPos, this);
+
+    m_srvSetVariable = nh.advertiseService(
+         "SetVariable", &DensoRobotHW::Service_SetVariable, this);
+
     return;
   }
 
@@ -675,4 +679,46 @@ namespace denso_robot_control
       return false;
     }
   }
+
+  bool DensoRobotHW::Service_SetVariable(
+		  denso_robot_control::SetVariable::Request &req,
+		  denso_robot_control::SetVariable::Response &res )
+  {
+    HRESULT hr; 
+    DensoVariable_Ptr pVar;
+    hr =  m_ctrl->get_Variable(req.name, &pVar);
+
+    if(FAILED(hr)) {
+      hr = m_ctrl->AddVariable(req.name);
+      if(SUCCEEDED(hr)) {
+        hr =  m_ctrl->get_Variable(req.name, &pVar);
+      }else{
+        std::cerr << "Fail to add Variable" << std::endl;
+      }
+    }
+
+    if(SUCCEEDED(hr)) {
+      VARIANT_Ptr vntVal(new VARIANT());
+      float *pval;
+     
+      vntVal->vt = (VT_ARRAY | VT_R4);
+      vntVal->parray = SafeArrayCreateVector(VT_R4, 0, req.data.size());
+
+      SafeArrayAccessData(vntVal->parray, (void**)&pval);
+      std::copy(req.data.begin(), req.data.end(), pval);
+      SafeArrayUnaccessData(vntVal->parray);
+
+      hr = pVar->ExecPutValue(vntVal);
+
+      if(SUCCEEDED(hr)) {
+        res.result = hr;
+        return true;
+      }else{
+        std::cerr << "Error: Invalid data type" << std::endl;
+      }
+    }
+    res.result = hr;
+    return false;
+  }
+
 } // denso_robot_control

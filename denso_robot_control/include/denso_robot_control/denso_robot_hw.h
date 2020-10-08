@@ -47,6 +47,7 @@ using namespace std_msgs;
 
 #include "denso_robot_control/HandIO.h"
 #include "denso_robot_control/GetVariable.h"
+#include "denso_robot_control/SetVariable.h"
 
 using namespace denso_robot_core;
 
@@ -104,6 +105,9 @@ namespace denso_robot_control
     bool Service_GetCurrentPos(denso_robot_control::GetVariable::Request &req,
 		              denso_robot_control::GetVariable::Response &res );
 
+    bool Service_SetVariable(denso_robot_control::SetVariable::Request &req,
+		              denso_robot_control::SetVariable::Response &res );
+
   private:
     hardware_interface::JointStateInterface m_JntStInterface;
     hardware_interface::PositionJointInterface m_PosJntInterface;
@@ -142,6 +146,7 @@ namespace denso_robot_control
     ros::ServiceServer m_srvCobottaHand;
     ros::ServiceServer m_srvGetVariable;
     ros::ServiceServer m_srvGetCurrentPos;
+    ros::ServiceServer m_srvSetVariable;
 
     ros::Publisher  m_pubCurMode;
     ros::Publisher  m_pubMiniIO;
