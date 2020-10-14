@@ -1,6 +1,9 @@
 <launch>
   <!-- Override robot_name argument -->
   <arg name="robot_name" default="vs060" />
+
+  <arg name="rviz" default="true" />
+  <arg name="pipeline" default="ompl" />
  
   <!-- the "sim" argument controls whether we connect to a Simulated or Real robot -->
   <!--  - if sim=false, a ip_address argument is required -->
@@ -46,12 +49,17 @@
   <include file="$(find denso_robot_moveit_config)/launch/move_group.launch">
     <arg name="publish_monitored_planning_scene" value="true" />
     <arg name="robot_name" value="$(arg robot_name)" />
+    <arg name="pipeline" value="$(arg pipeline)" />
   </include>
 
+  <group if="$(arg rviz)">
   <include file="$(find denso_robot_moveit_config)/launch/moveit_rviz.launch">
     <arg name="config" value="true"/>
   </include>
-  
+  </group>
+
+  <!--
   <include file="$(find denso_robot_moveit_config)/launch/default_warehouse_db.launch" />
+  -->
 
 </launch>

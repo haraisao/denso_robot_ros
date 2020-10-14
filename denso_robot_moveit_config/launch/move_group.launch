@@ -2,6 +2,8 @@
 
   <arg name="robot_name" default="vs060" />
 
+  <arg name="pipeline" default="ompl" />
+
   <include file="$(find denso_robot_moveit_config)/launch/planning_context.launch">
     <arg name="robot_name" value="$(arg robot_name)" />
   </include>
@@ -24,7 +26,7 @@
 
   <!-- Planning Functionality -->
   <include ns="move_group" file="$(find denso_robot_moveit_config)/launch/planning_pipeline.launch.xml">
-    <arg name="pipeline" value="ompl" />
+    <arg name="pipeline" value="$(arg pipeline)" />
   </include>
 
   <!-- Trajectory Execution Functionality -->
@@ -39,6 +41,34 @@
     <arg name="moveit_sensor_manager" value="denso_robot" /> 
   </include>
 
+  <!-- move_group parameters -->
+    <arg name="capabilities" default="" />
+    <arg name="_capabilities" value="$(arg capalilities)
+                      move_group/MoveGroupCartesianPathService
+				      move_group/MoveGroupExecuteTrajectoryAction
+				      move_group/MoveGroupKinematicsService
+				      move_group/MoveGroupMoveAction
+				      move_group/MoveGroupPickPlaceAction
+				      move_group/MoveGroupPlanService
+				      move_group/MoveGroupQueryPlannersService
+				      move_group/MoveGroupStateValidationService
+				      move_group/MoveGroupGetPlanningSceneService"
+           unless="$(eval arg('pipeline)=='pilz_command_planner')" />
+
+    <arg name="_capabilities" value="$(arg capabilities)
+                      move_group/MoveGroupCartesianPathService
+                      move_group/MoveGroupExecuteTrajectoryAction
+                      move_group/MoveGroupKinematicsService
+                      move_group/MoveGroupMoveAction
+                      move_group/MoveGroupPlanService
+                      move_group/MoveGroupQueryPlannersService
+                      move_group/MoveGroupStateValidationService
+                      move_group/MoveGroupGetPlanningSceneService
+                  pilz_trajectory_generation/MoveGroupSequenceAction
+                  pilz_trajectory_generation/MoveGroupSequenceService"
+        if="$(eval arg('pipeline')=='pilz_command_planner')" />
+
+
   <!-- Start the actual move_group node/action server -->
   <node name="move_group" launch-prefix="$(arg launch_prefix)" pkg="moveit_ros_move_group" type="move_group" respawn="false" output="screen"
    args="joint_states:=/$(arg robot_name)/joint_states $(arg command_args)">
@@ -50,16 +80,7 @@
     <param name="jiggle_fraction" value="$(arg jiggle_fraction)" />
 
     <!-- MoveGroup capabilities to load -->
-    <param name="capabilities" value="move_group/MoveGroupCartesianPathService
-				      move_group/MoveGroupExecuteTrajectoryAction
-				      move_group/MoveGroupKinematicsService
-				      move_group/MoveGroupMoveAction
-				      move_group/MoveGroupPickPlaceAction
-				      move_group/MoveGroupPlanService
-				      move_group/MoveGroupQueryPlannersService
-				      move_group/MoveGroupStateValidationService
-				      move_group/MoveGroupGetPlanningSceneService
-				      " />
+    <param name="capabilities" value="$(arg _capabilities)" />
 
     <!-- Publish the planning scene of the physical robot so that rviz plugin can know actual robot -->
     <param name="planning_scene_monitor/publish_planning_scene" value="$(arg publish_monitored_planning_scene)" />
